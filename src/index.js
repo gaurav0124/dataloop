@@ -106,31 +106,6 @@ async function findLinks(linkObj) {
   }
 }
 
-//Go all the way up and set RootNode to the parent node
-function setRootNode() {
-  while (currentNode.parent != null) {
-    currentNode = currentNode.parent;
-  }
-  rootNode = currentNode;
-}
-
-function printTree() {
-  addToPrintDFS(rootNode);
-  console.log(printList.join("\n|"));
-}
-
-function addToPrintDFS(node) {
-  let spaces = Array(node.depth * 3).join("-");
-  printList.push(spaces + node.url);
-  if (node.children) {
-    node.children.map(function (i, x) {
-      {
-        addToPrintDFS(i);
-      }
-    });
-  }
-}
-
 function addToLinkQueue(linkobj) {
   if (!linkInSeenListExists(linkobj)) {
     if (linkobj.parent != null) {
@@ -154,12 +129,10 @@ function peekInQueue() {
   return linksQueue[0];
 }
 
-//Adds links we've visited to the seenList
 function addToSeen(linkObj) {
   seenLinks[linkObj.url] = linkObj;
 }
 
-//Returns whether the link has been seen.
 function linkInSeenListExists(linkObj) {
   return seenLinks[linkObj.url] == null ? false : true;
 }
