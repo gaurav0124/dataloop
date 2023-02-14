@@ -1,0 +1,28 @@
+{
+  "name": "dataloop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaurav0124/dataloop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gaurav0124/dataloop/issues"
+  },
+  "homepage": "https://github.com/gaurav0124/dataloop#readme",
+  "dependencies": {
+    "browserify-fs": "^1.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "node-fetch": "^2.6.9"
+  },
+  "devDependencies": {
+    "tslib": "^2.5.0"
+  }
+}
