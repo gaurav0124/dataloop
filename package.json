@@ -20,6 +20,7 @@
   "dependencies": {
     "browserify-fs": "^1.0.0",
     "cheerio": "^1.0.0-rc.12",
+    "is-url-http": "^2.3.5",
     "node-fetch": "^2.6.9"
   },
   "devDependencies": {
