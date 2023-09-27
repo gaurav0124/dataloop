@@ -115,8 +115,10 @@ class ListNode {
     this.next = null;
   }
 }
-const checkifExist = url => {
-  const exist = allLinksStack.find(item => item.url === url);
+const checkifExist = (arrayobj, url) => {
+  const exist = arrayobj.find(item => {
+    return item.url ? item.url === url : item === url;
+  });
   if (exist) {
     return true;
   } else {
@@ -125,23 +127,31 @@ const checkifExist = url => {
 };
 
 const getAllImages = async () => {
-  let results = [];
-  for (let i = 0; i < allLinksStack.length; i++) {
-    let response = await fetch(allLinksStack[i].url);
-    let html = await response.text();
-    let $ = cheerio.load(html);
-    const allImages = $("img")
-      .map((index, image) => image.attribs.src)
-      .get();
+  try {
+    let results = [];
+    for (let i = 0; i < allLinksStack.length; i++) {
+      let response = await fetch(allLinksStack[i].url);
+      let html = await response.text();
+      let $ = cheerio.load(html);
+      const allImages = $("img")
+        .map((index, image) => image.attribs.src)
+        .get();
 
-    allImages.forEach(images => {
-      let obj = {
-        imageUrl: images,
-        srcUrl: allLinksStack[i].url,
-        depth: allLinksStack[i].depth,
-      };
-      results.push(obj);
+      allImages.forEach(images => {
+        let obj = {
+          imageUrl: images,
+          srcUrl: allLinksStack[i].url,
+          depth: allLinksStack[i].depth,
+        };
+        results.push(obj);
+      });
+    }
+    fs.writeFileSync("results.json", JSON.stringify(results), function (err) {
+      if (err) throw err;
+      console.log("complete");
     });
+  } catch (e) {
+    console.log(e);
   }
 };
 const urlWithInitialDepth = "https://scrapeme.live/shop/";
@@ -172,7 +182,7 @@ async function crawlBFS(startURL, maxDepth = 3) {
 
 const getUrl = link => {
   if (link) {
-    if (link.includes("http")) {
+    if (link.includes("https://scrapeme.live/shop/page")) {
       return link;
     } else {
       return;
@@ -187,7 +197,10 @@ async function findLinks(linkObj, list, position) {
     if (Array.isArray(linkObj.url)) {
       let forLoopNewLinks = [];
       for (let i = 0; i < linkObj.url.length; i++) {
-        if (!checkifExist(linkObj.url[i])) {
+        if (
+          !checkifExist(allLinksStack, linkObj.url[i]) &&
+          getUrl(linkObj.url[i])
+        ) {
           const pushData = {
             depth: position,
             url: linkObj.url[i],
@@ -199,7 +212,7 @@ async function findLinks(linkObj, list, position) {
           let linksforloop = $("a")
             .map((index, linkItem) => {
               const url = getUrl(linkItem.attribs.href);
-              if (isUrlHttp && url) {
+              if (isUrlHttp && url && !checkifExist(allLinksStack, url)) {
                 return url;
               } else {
                 return;
@@ -207,7 +220,11 @@ async function findLinks(linkObj, list, position) {
             })
             .get();
           if (linksforloop.length > 0) {
-            forLoopNewLinks.push(linksforloop);
+            for (let i = 0; i < linksforloop.length; i++) {
+              if (!checkifExist(forLoopNewLinks, linksforloop[i])) {
+                forLoopNewLinks.push(linksforloop[i]);
+              }
+            }
           }
         }
       }
@@ -215,9 +232,9 @@ async function findLinks(linkObj, list, position) {
         url: forLoopNewLinks,
         depth: 1,
       });
-      list.addAtPosition(forLoopNewLinkObj, position);
+      list.add(forLoopNewLinkObj);
     } else {
-      if (!checkifExist(linkObj.url)) {
+      if (!checkifExist(allLinksStack, linkObj.url)) {
         const pushData = {
           depth: position,
           url: linkObj.url,
@@ -229,7 +246,7 @@ async function findLinks(linkObj, list, position) {
         let links = $("a")
           .map((index, linkItem) => {
             const url = getUrl(linkItem.attribs.href);
-            if (isUrlHttp && url) {
+            if (isUrlHttp && url && !checkifExist(allLinksStack, url)) {
               return url;
             } else {
               return;
@@ -239,7 +256,7 @@ async function findLinks(linkObj, list, position) {
 
         if (links.length > 0) {
           const newLinkObj = new ListNode({ url: links, depth: 1 });
-          list.addAtPosition(newLinkObj, position);
+          list.add(newLinkObj);
           const allLinksVal = list.getAll();
         }
       }
