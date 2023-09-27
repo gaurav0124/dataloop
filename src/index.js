@@ -3,17 +3,9 @@ const isUrlHttp = require("is-url-http");
 const cheerio = require("cheerio");
 var fs = require("fs");
 let allLinksStack = [];
-let seenLinks = {};
-
-let rootNode = {};
-let currentNode = {};
 
 let linksQueue = [];
-let printList = [];
-
-let previousDepth = 0;
 let maxCrawlingDepth = 3;
-let results = [];
 let newDepth = 0;
 class LinkedList {
   constructor() {
@@ -176,10 +168,6 @@ async function crawlBFS(startURL, maxDepth = 3) {
   console.log(allLinksStack);
 }
 
-// async function crawl(linkObj) {
-//   await findLinks(linkObj);
-// }
-
 const getUrl = link => {
   if (link) {
     if (link.includes("https://scrapeme.live/shop/page")) {
@@ -261,30 +249,6 @@ async function findLinks(linkObj, list, position) {
         }
       }
     }
-
-    // const allImages = $("img")
-    //   .map((index, image) => image.attribs.src)
-    //   .get();
-
-    // allImages.forEach(images => {
-    //   let obj = {
-    //     imageUrl: images,
-    //     srcUrl: linkObj.url,
-    //     depth: linkObj.depth,
-    //   };
-    //   results.push(obj);
-    // });
-
-    // let nextLinkObj = getNextInQueue();
-    // if (nextLinkObj && nextLinkObj.depth <= maxCrawlingDepth) {
-    //   console.log("depth====>", nextLinkObj.depth);
-    //   await crawl(nextLinkObj);
-    // } else {
-    //   fs.writeFileSync("results.json", JSON.stringify(results), function (err) {
-    //     if (err) throw err;
-    //     console.log("complete");
-    //   });
-    // }
   } catch (err) {
     console.log("Something Went Wrong...", err);
   }
@@ -299,24 +263,3 @@ function addToLinkQueue(linkobj) {
     addToSeen(linkobj);
   }
 }
-
-// function getNextInQueue() {
-//   let nextLink = linksQueue.shift();
-//   if (nextLink && nextLink.depth > previousDepth) {
-//     previousDepth = nextLink.depth;
-//     console.log(`------- CRAWLING ON DEPTH LEVEL ${previousDepth} --------`);
-//   }
-//   return nextLink;
-// }
-
-// function peekInQueue() {
-//   return linksQueue[0];
-// }
-
-// function addToSeen(linkObj) {
-//   seenLinks[linkObj.url] = linkObj;
-// }
-
-// function linkInSeenListExists(linkObj) {
-//   return seenLinks[linkObj.url] == null ? false : true;
-// }
